@@ -19,7 +19,7 @@ const LandingPage = () => {
   const { isAuthenticated } = useAuth();
 
   const handleGoogleLogin = () => {
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:9229';
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
     globalThis.location.href = `${apiUrl}/users/auth/google`;
   };
 

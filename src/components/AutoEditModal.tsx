@@ -69,7 +69,6 @@ const AutoEditModal: React.FC<AutoEditModalProps> = ({ isOpen, onClose, selected
 
   if (!isOpen) return null;
 
-  const selectedPreset = presets.find(p => p._id === selectedPresetId);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">

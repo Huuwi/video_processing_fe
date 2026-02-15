@@ -6,8 +6,8 @@ const LoginPage = () => {
 
   const handleGoogleLogin = () => {
     setIsLoading(true);
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:9229';
-    window.location.href = `${apiUrl}/users/auth/google`;
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+    globalThis.location.href = `${apiUrl}/users/auth/google`;
   };
 
   return (
