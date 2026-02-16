@@ -255,7 +255,7 @@ function HomePage() {
                         </div>
                         <textarea
                             className="w-full bg-black/40 border border-gray-700 text-white rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-600 transition-all min-h-[100px] resize-y"
-                            placeholder="Dán link vide từ douyin hoặc bilibili vào đây(mỗi dòng là 1 video)"
+                            placeholder="Dán link video từ douyin hoặc bilibili vào đây(mỗi dòng là 1 video)"
                             value={inputUrls}
                             onChange={(e) => setInputUrls(e.target.value)}
                             disabled={isLoading}
