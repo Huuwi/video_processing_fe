@@ -66,7 +66,7 @@ const PresetManager: React.FC<PresetManagerProps> = ({ onClose }) => {
             <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400">
               <Settings size={20} />
             </div>
-            <h2 className="text-xl font-bold text-white">Manage Presets</h2>
+            <h2 className="text-xl font-bold text-white">Quản lý template</h2>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-white"><X size={24} /></button>
         </div>
@@ -84,7 +84,7 @@ const PresetManager: React.FC<PresetManagerProps> = ({ onClose }) => {
                 <div className="w-12 h-12 rounded-full bg-gray-800 group-hover:bg-blue-500/20 flex items-center justify-center text-gray-500 group-hover:text-blue-400 transition-colors">
                   <Plus size={24} />
                 </div>
-                <span className="font-medium text-gray-400 group-hover:text-white">Create New Preset</span>
+                <span className="font-medium text-gray-400 group-hover:text-white">Tạo mới template</span>
               </button>
 
               {/* Preset Cards */}

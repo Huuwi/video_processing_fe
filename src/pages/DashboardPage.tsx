@@ -154,8 +154,8 @@ function DashboardPage() {
         <div className="mb-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                 <div>
-                    <h2 className="text-2xl font-bold text-white mb-1">Your Videos</h2>
-                    <p className="text-gray-400 text-sm">{totalVideos} total videos</p>
+                    <h2 className="text-2xl font-bold text-white mb-1">Video của bạn</h2>
+                    <p className="text-gray-400 text-sm">{totalVideos} Tổng video</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
                     <button
@@ -163,7 +163,7 @@ function DashboardPage() {
                         className="px-3 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 border border-gray-700"
                     >
                         <Settings size={16} />
-                        Manage Presets
+                        Quản lý template
                     </button>
                     {videos.filter(v => v.stage === 'user_editing' || v.stage === 'download').length > 0 && (
                         <div className="flex items-center gap-3">
@@ -171,7 +171,7 @@ function DashboardPage() {
                                 onClick={handleSelectAll}
                                 className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors text-sm"
                             >
-                                {selectedVideos.length > 0 ? 'Deselect All' : 'Select All Editable'}
+                                {selectedVideos.length > 0 ? 'Bỏ chọn tất cả' : 'Chọn tất cả video có thể edit'}
                             </button>
                             {selectedVideos.length > 0 && (
                                 <button
@@ -237,7 +237,7 @@ function DashboardPage() {
             
             <div className="flex items-center gap-2 text-gray-400 text-sm">
                 <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                System Operational
+                Search video
             </div>
         </div>
 
@@ -246,7 +246,7 @@ function DashboardPage() {
             <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-xl p-6">
                 <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                     <Plus className="text-blue-500" />
-                    New Project
+                    Thêm videos
                 </h3>
                 <form onSubmit={handleSubmit}>
                     <div className="relative">
@@ -255,7 +255,7 @@ function DashboardPage() {
                         </div>
                         <textarea
                             className="w-full bg-black/40 border border-gray-700 text-white rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-600 transition-all min-h-[100px] resize-y"
-                            placeholder="Paste video URLs here (one per line)..."
+                            placeholder="Dán link vide từ douyin hoặc bilibili vào đây(mỗi dòng là 1 video)"
                             value={inputUrls}
                             onChange={(e) => setInputUrls(e.target.value)}
                             disabled={isLoading}
@@ -267,7 +267,7 @@ function DashboardPage() {
                             disabled={isLoading || !inputUrls}
                             className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-2.5 rounded-xl font-bold transition-all shadow-lg shadow-blue-600/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                         >
-                            {isLoading ? 'Processing...' : 'Start Processing'}
+                            {isLoading ? 'Đang thực thi...' : 'Bắt đầu thực thi'}
                         </button>
                     </div>
                 </form>
@@ -277,7 +277,7 @@ function DashboardPage() {
         {/* Content Grid */}
         <div>
             <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-white">Recent Projects</h3>
+                <h3 className="text-xl font-bold text-white">Recent Videos</h3>
                 <div className="flex items-center gap-2">
                     <span className="text-sm text-gray-400">Page {page} of {totalPages}</span>
                 </div>

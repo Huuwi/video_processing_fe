@@ -71,14 +71,16 @@ const LandingPage = () => {
       {/* Navigation */}
       <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-black/50 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-              <Zap className="text-white fill-white w-6 h-6" />
-            </div>
-            <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
+          <Link to="/" className="flex items-center gap-4 group">
+            <img 
+              src="/logo.png" 
+              alt="Z-Video Logo" 
+              className="w-24 h-24 object-contain group-hover:scale-105 transition-transform duration-300" 
+            />
+            <span className="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
               Z-Video
             </span>
-          </div>
+          </Link>
 
           <div className="flex items-center gap-4">
             {isAuthenticated ? (
@@ -240,11 +242,13 @@ const LandingPage = () => {
 
       {/* Footer */}
       <footer className="py-20 px-6 border-t border-white/5 flex flex-col items-center">
-        <div className="flex items-center gap-2 mb-8 opacity-50">
-          <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
-            <Zap className="text-black fill-black w-5 h-5" />
-          </div>
-          <span className="text-lg font-bold">Z-Video</span>
+        <div className="flex items-center gap-4 mb-8 opacity-90 hover:opacity-100 transition-opacity group">
+          <img 
+            src="/logo.png" 
+            alt="Z-Video" 
+            className="w-24 h-24 object-contain group-hover:scale-110 transition-transform" 
+          />
+          <span className="text-3xl font-black text-white uppercase tracking-tighter">Z-Video</span>
         </div>
         <p className="text-gray-500 text-sm mb-4">Built for high-performance content creation.</p>
         <div className="flex gap-8 text-gray-500 text-xs mb-8">

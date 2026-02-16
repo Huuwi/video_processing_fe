@@ -2,7 +2,7 @@
 import { type ReactNode, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
-import { LogOut, Home, Settings, History, Menu, X, Mail, Clock, CreditCard } from 'lucide-react';
+import { LogOut, Home, Info, Shield, FileText, Menu, X, Mail, Clock, CreditCard } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 interface DashboardLayoutProps {
@@ -15,9 +15,11 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const location = useLocation();
 
   const navItems = [
-    { icon: Home, label: 'Dashboard', path: '/dashboard' },
-    { icon: History, label: 'History', path: '/history' },
-    { icon: Settings, label: 'Settings', path: '/settings' },
+    { icon: Home, label: 'Bảng điều khiển', path: '/dashboard' },
+    { icon: CreditCard, label: 'Nạp tiền', path: '/deposit' },
+    { icon: Info, label: 'Về chúng tôi', path: '/about' },
+    { icon: Shield, label: 'Chính sách bảo mật', path: '/privacy' },
+    { icon: FileText, label: 'Điều khoản dịch vụ', path: '/terms' },
   ];
 
   const formatTime = (ms: number = 0) => {
@@ -45,9 +47,16 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         `}
       >
         <div className="p-6 flex items-center justify-between">
-          <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
-            Auto edit video
-          </h1>
+          <Link to="/dashboard" className="flex items-center gap-4 group">
+            {/* <img 
+              src="/logo.png" 
+              alt="Z-Video Logo" 
+              className="w-24 h-24 object-contain group-hover:scale-105 transition-transform duration-300" 
+            /> */}
+            <h1 className="text-4xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
+              Z-Video
+            </h1>
+          </Link>
           <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-gray-400 hover:text-white">
             <X size={24} />
           </button>
@@ -133,7 +142,10 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
              <button onClick={() => setIsSidebarOpen(true)} className="text-gray-400 hover:text-white">
                 <Menu size={24} />
              </button>
-             <span className="font-bold">Auto edit video</span>
+             <div className="flex items-center gap-3">
+                <img src="/logo.png" alt="Logo" className="w-16 h-16 object-contain" />
+                <span className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">Z-Video</span>
+             </div>
              <div className="w-6" /> {/* Spacer */}
          </header>
 

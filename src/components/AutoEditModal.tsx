@@ -60,8 +60,8 @@ const AutoEditModal: React.FC<AutoEditModalProps> = ({ isOpen, onClose, selected
       onSuccess();
       onClose();
     } catch (error) {
-      console.error('Failed to apply preset:', error);
-      toast.error('Failed to apply preset. Please try again.');
+      console.error('Failed to apply Template:', error);
+      toast.error('Failed to apply Template. Please try again.');
     } finally {
       setProcessing(false);
     }
@@ -158,7 +158,7 @@ const AutoEditModal: React.FC<AutoEditModalProps> = ({ isOpen, onClose, selected
               className="flex-1 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl transition-all shadow-lg shadow-purple-900/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed font-bold flex items-center justify-center gap-2"
             >
               {processing ? <Loader2 className="animate-spin" size={20} /> : <Wand2 size={20} />}
-              {processing ? 'Applying...' : 'Apply Preset'}
+              {processing ? 'Applying...' : 'Apply Template'}
             </button>
           </div>
         </div>

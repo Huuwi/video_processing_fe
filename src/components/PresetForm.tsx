@@ -147,7 +147,7 @@ const PresetForm: React.FC<PresetFormProps> = ({ initialData, onSave, onCancel }
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     if (!name) {
-      toast.error('Please enter a preset name');
+      toast.error('Vui lòng nhập tên template');
       return;
     }
     
@@ -239,7 +239,7 @@ const PresetForm: React.FC<PresetFormProps> = ({ initialData, onSave, onCancel }
               value={name} 
               onChange={e => setName(e.target.value)}
               className="bg-transparent text-xl font-bold text-white border-b border-transparent hover:border-gray-700 focus:border-blue-500 outline-none px-2 py-1 transition-all"
-              placeholder="Preset Name (e.g. TikTok Viral)"
+              placeholder="Điền Tên template"
               autoFocus
             />
              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-gray-800/50 border border-gray-700">

@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { LogIn } from 'lucide-react';
 
 const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -23,13 +22,15 @@ const LoginPage = () => {
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700" />
           
           <div className="flex flex-col items-center text-center mb-10">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-blue-500/20 rotate-3 group-hover:rotate-0 transition-transform duration-500">
-              <LogIn className="text-white w-8 h-8" />
-            </div>
-            <h1 className="text-3xl font-bold text-white mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
-              Auto Edit Video
+            <img 
+              src="/logo.png" 
+              alt="Z-Video Logo" 
+              className="w-56 h-56 object-contain mb-8 rotate-3 group-hover:rotate-0 transition-all duration-700 drop-shadow-2xl" 
+            />
+            <h1 className="text-6xl font-black text-white mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
+              Z-Video
             </h1>
-            <p className="text-gray-400">Sign in to start creating amazing content</p>
+            <p className="text-gray-400 text-xl font-medium tracking-wide">Đăng nhập để bắt đầu sáng tạo video</p>
           </div>
 
           <div className="space-y-4">
