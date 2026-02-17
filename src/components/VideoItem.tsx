@@ -77,12 +77,12 @@ const VideoItem: React.FC<VideoProps> = ({ video, onEdit, onRetry, isSelected, o
     return (
         <div className="group bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-blue-500/30 rounded-2xl p-4 transition-all hover:bg-gray-800/50 hover:shadow-lg hover:shadow-blue-500/5">
             <div className="flex items-start justify-between gap-4">
-                <div className="flex items-center gap-4">
+                <div className="flex-1 min-w-0 flex items-center gap-4">
                     {/* Retry button for failed videos */}
                     {video.status === 'failed' && onRetry ? (
                         <button 
                             onClick={() => onRetry(video)}
-                            className="p-2 text-red-500 hover:text-white hover:bg-red-600 rounded-lg transition-colors"
+                            className="p-2 text-red-500 hover:text-white hover:bg-red-600 rounded-lg transition-colors shrink-0"
                             title="Retry Processing"
                         >
                             <RotateCcw size={20} />
@@ -94,11 +94,11 @@ const VideoItem: React.FC<VideoProps> = ({ video, onEdit, onRetry, isSelected, o
                                 type="checkbox"
                                 checked={isSelected || false}
                                 onChange={() => onToggleSelect && onToggleSelect(video._id)}
-                                className="w-5 h-5 rounded border-gray-700 bg-gray-800 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-900 cursor-pointer"
+                                className="w-5 h-5 rounded border-gray-700 bg-gray-800 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-900 cursor-pointer shrink-0"
                             />
                         )
                     )}
-                    <div className="w-12 h-12 rounded-xl bg-gray-800 flex items-center justify-center text-gray-500 group-hover:text-blue-400 transition-colors">
+                    <div className="w-12 h-12 rounded-xl bg-gray-800 flex items-center justify-center text-gray-500 group-hover:text-blue-400 transition-colors shrink-0">
                         <Film size={24} />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -124,7 +124,7 @@ const VideoItem: React.FC<VideoProps> = ({ video, onEdit, onRetry, isSelected, o
                                 />
                                 <button 
                                     onClick={handleTitleSave}
-                                    className="p-1 hover:text-green-400 transition-colors"
+                                    className="p-1 hover:text-green-400 transition-colors shrink-0"
                                 >
                                     <CheckCircle size={16} />
                                 </button>
@@ -133,7 +133,7 @@ const VideoItem: React.FC<VideoProps> = ({ video, onEdit, onRetry, isSelected, o
                                         setIsEditingTitle(false);
                                         setTitleInput(video.title || 'Untitled Video');
                                     }}
-                                    className="p-1 hover:text-red-400 transition-colors"
+                                    className="p-1 hover:text-red-400 transition-colors shrink-0"
                                 >
                                     <X size={16} />
                                 </button>
@@ -141,35 +141,34 @@ const VideoItem: React.FC<VideoProps> = ({ video, onEdit, onRetry, isSelected, o
                         ) : (
                             <div className="group/title flex items-center gap-2">
                                 <h3 
-                                    className="font-semibold text-white line-clamp-1 cursor-pointer hover:text-blue-400 transition-colors" 
-                                    title="Click to edit title"
+                                    className="font-semibold text-white truncate cursor-pointer hover:text-blue-400 transition-colors" 
+                                    title={video.title || 'Untitled Video'}
                                     onClick={() => setIsEditingTitle(true)}
                                 >
                                     {video.title || 'Untitled Video'}
                                 </h3>
                                 <button 
                                     onClick={() => setIsEditingTitle(true)}
-                                    className="opacity-0 group-hover/title:opacity-100 text-gray-500 hover:text-blue-400 transition-opacity"
+                                    className="opacity-0 group-hover/title:opacity-100 text-gray-500 hover:text-blue-400 transition-opacity shrink-0"
                                 >
                                     <Edit3 size={14} />
                                 </button>
                             </div>
                         )}
-                         <p className="text-xs text-gray-500 font-mono mt-0.5 max-w-[200px] truncate">{video.url}</p>
+                         <p className="text-xs text-gray-500 font-mono mt-0.5 truncate">{video.url}</p>
                     </div>
                 </div>
                 
                 <div 
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border ${statusConfig.bg} ${statusConfig.color} ${statusConfig.border} ${video.status === 'failed' ? 'cursor-pointer hover:opacity-80' : ''}`}
+                    className={`flex items-center justify-center w-8 h-8 rounded-full border ${statusConfig.bg} ${statusConfig.color} ${statusConfig.border} ${video.status === 'failed' ? 'cursor-pointer hover:opacity-80' : ''}`}
                     onClick={() => {
                         if (video.status === 'failed' && video.errorMsg) {
                             toast.error(video.errorMsg);
                         }
                     }}
-                    title={video.status === 'failed' ? video.errorMsg : undefined}
+                    title={video.status.toUpperCase() + (video.status === 'failed' && video.errorMsg ? `: ${video.errorMsg}` : '')}
                 >
-                    <StatusIcon size={14} className={video.status === 'pending' ? 'animate-spin' : ''} />
-                    <span className="uppercase tracking-wider">{video.status}</span>
+                    <StatusIcon size={16} className={video.status === 'pending' ? 'animate-spin' : ''} />
                 </div>
             </div>
 
