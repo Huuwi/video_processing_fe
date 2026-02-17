@@ -23,7 +23,7 @@ interface VideoProps {
 }
 
 const VideoItem: React.FC<VideoProps> = ({ video, onEdit, onRetry, isSelected, onToggleSelect, onUpdate }) => {
-    const isReadyToEdit = video.stage === 'user_editing';
+    const isReadyToEdit = video.stage === 'user_editing' && video.status !== 'failed';
     const [isEditingTitle, setIsEditingTitle] = React.useState(false);
     const [titleInput, setTitleInput] = React.useState(video.title || '');
 
