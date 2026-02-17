@@ -57,6 +57,7 @@ const VideoItem: React.FC<VideoProps> = ({ video, onEdit, onRetry, isSelected, o
     const getStatusConfig = () => {
         if (video.status === 'completed') return { color: 'text-green-400', bg: 'bg-green-500/10', border: 'border-green-500/20', icon: CheckCircle };
         if (video.status === 'failed') return { color: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/20', icon: AlertCircle };
+        if (video.status === 'inprogress') return { color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20', icon: Loader2 };
         return { color: 'text-yellow-400', bg: 'bg-yellow-500/10', border: 'border-yellow-500/20', icon: Loader2 };
     };
 
@@ -168,7 +169,7 @@ const VideoItem: React.FC<VideoProps> = ({ video, onEdit, onRetry, isSelected, o
                     }}
                     title={video.status.toUpperCase() + (video.status === 'failed' && video.errorMsg ? `: ${video.errorMsg}` : '')}
                 >
-                    <StatusIcon size={16} className={video.status === 'pending' ? 'animate-spin' : ''} />
+                    <StatusIcon size={16} className={(video.status === 'pending' || video.status === 'inprogress') ? 'animate-spin' : ''} />
                 </div>
             </div>
 
