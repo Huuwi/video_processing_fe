@@ -33,7 +33,7 @@ const AboutPage = () => {
 
           <h2 className="text-xl font-semibold text-white mt-8">Liên hệ</h2>
           <p>
-            Mọi thắc mắc hoặc yêu cầu hỗ trợ, vui lòng liên hệ với chúng tôi qua email: <span className="text-blue-400 font-medium">support@zvideo.org</span>
+            Mọi thắc mắc hoặc yêu cầu hỗ trợ, vui lòng truy cập group zalo của chúng tôi: <span className="text-blue-400 font-medium">https://zalo.me/g/lcairy656</span>
           </p>
         </div>
       </div>
