@@ -14,6 +14,19 @@ interface VbeeVoice {
   demo: string;
 }
 
+const FONT_OPTIONS = [
+  { label: 'Arial (Sans-serif)', value: 'Arial' },
+  { label: 'Times New Roman (Serif)', value: 'Times New Roman' },
+  { label: 'Courier New (Monospace)', value: 'Courier New' },
+  { label: 'Verdana', value: 'Verdana' },
+  { label: 'Tahoma', value: 'Tahoma' },
+  { label: 'Trebuchet MS', value: 'Trebuchet MS' },
+  { label: 'Georgia', value: 'Georgia' },
+  { label: 'Garamond', value: 'Garamond' },
+  { label: 'Impact', value: 'Impact' },
+  { label: 'Comic Sans MS', value: 'Comic Sans MS' },
+];
+
 interface VideoEditorProps {
   video: any;
   onSave: () => void;
@@ -40,6 +53,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
   const [subtitleBgColor, setSubtitleBgColor] = useState<string>('#000000');
   const [subtitlePosition, setSubtitlePosition] = useState<'top' | 'middle' | 'bottom'>('bottom');
   const [subtitleFontSize, setSubtitleFontSize] = useState<number>(21);
+  const [subtitleFont, setSubtitleFont] = useState<string>('Arial');
   const [subtitleLanguage, setSubtitleLanguage] = useState<string>('vietnamese');
   const [subtitleVoiceCode, setSubtitleVoiceCode] = useState<string>('');
   const [voices, setVoices] = useState<VbeeVoice[]>([]);
@@ -47,6 +61,8 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
   const [playingDemo, setPlayingDemo] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [subtitleWidth, setSubtitleWidth] = useState<number>(300);
+  const [showSubtitle, setShowSubtitle] = useState(true);
+  const [bgOpacity, setBgOpacity] = useState(1);
   
   // Title editing state
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -137,10 +153,14 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
     // Reset subtitle
     setSubtitlePos({ x: 0, y: 0 });
     setSubtitleColor('#FFFFFF');
+    setSubtitleColor('#FFFFFF');
     setSubtitleBgColor('#000000');
     setSubtitlePosition('bottom');
     setSubtitleFontSize(21);
+    setSubtitleFont('Arial');
     setSubtitleWidth(300);
+    setShowSubtitle(true);
+
     
     // Reset logo
     setLogoUrl(null);
@@ -235,6 +255,8 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
             width: subtitleWidth,
             height: subtitleNodeRef.current?.offsetHeight || 0,
             font_size: subtitleFontSize,
+            show: showSubtitle,
+            bg_opacity: bgOpacity,
           },
           language: subtitleLanguage,
           voice_code: subtitleVoiceCode,
@@ -300,6 +322,8 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
             width: subtitleWidth,
             height: subtitleNodeRef.current?.offsetHeight || 0,
             font_size: subtitleFontSize,
+            show: showSubtitle,
+            bg_opacity: bgOpacity,
           },
           language: subtitleLanguage,
           voice_code: subtitleVoiceCode,
@@ -446,11 +470,19 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
                             padding: '8px 16px',
                             borderRadius: '4px',
                             fontSize: `${subtitleFontSize}px`,
+                            fontFamily: subtitleFont,
                             color: subtitleColor,
-                            backgroundColor: subtitleBgColor,
+                            backgroundColor: subtitleBgColor === 'transparent' 
+                                ? 'transparent' 
+                                : (subtitleBgColor.startsWith('#') 
+                                    ? `rgba(${Number.parseInt(subtitleBgColor.slice(1,3), 16)}, ${Number.parseInt(subtitleBgColor.slice(3,5), 16)}, ${Number.parseInt(subtitleBgColor.slice(5,7), 16)}, ${bgOpacity})`
+                                    : subtitleBgColor),
+                            backdropFilter: subtitleBgColor !== 'transparent' && bgOpacity < 1 ? 'blur(10px)' : 'none',
+                            WebkitBackdropFilter: subtitleBgColor !== 'transparent' && bgOpacity < 1 ? 'blur(10px)' : 'none',
                             fontWeight: 'bold',
                             textAlign: 'center',
-                            position: 'relative'
+                            position: 'relative',
+                            display: showSubtitle ? 'block' : 'none'
                         }}
                     >
                         <div className="absolute inset-0 border-2 border-dashed border-green-500 opacity-0 group-hover:opacity-100 transition-opacity rounded pointer-events-none" />
@@ -545,26 +577,59 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                  <div>
-                      <label htmlFor="video-text-color" className="block text-sm font-medium text-gray-400 mb-2">Text Color</label>
-                      <input
-                          type="color"
-                          id="video-text-color"
-                          value={subtitleColor}
-                          onChange={(e) => setSubtitleColor(e.target.value)}
-                          className="w-full h-10 rounded-lg cursor-pointer bg-gray-800 border border-gray-700"
-                      />
+                  <div className="col-span-2 flex items-center justify-between border-b border-gray-800 pb-2 mb-2">
+                    <span className="text-sm font-medium text-gray-300">Show Subtitles</span>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                        <input 
+                            type="checkbox" 
+                            checked={showSubtitle} 
+                            onChange={e => setShowSubtitle(e.target.checked)} 
+                            className="sr-only peer" 
+                            aria-label="Toggle Subtitles"
+                        />
+                        <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
                   </div>
-                  <div>
-                      <label htmlFor="video-bg-color" className="block text-sm font-medium text-gray-400 mb-2">Background</label>
-                      <input
-                          type="color"
-                          id="video-bg-color"
-                          value={subtitleBgColor}
-                          onChange={(e) => setSubtitleBgColor(e.target.value)}
-                          className="w-full h-10 rounded-lg cursor-pointer bg-gray-800 border border-gray-700"
-                      />
-                  </div>
+
+                  {showSubtitle && (
+                    <>
+                      <div>
+                          <label htmlFor="video-text-color" className="block text-sm font-medium text-gray-400 mb-2">Text Color</label>
+                          <input
+                              type="color"
+                              id="video-text-color"
+                              value={subtitleColor}
+                              onChange={(e) => setSubtitleColor(e.target.value)}
+                              className="w-full h-10 rounded-lg cursor-pointer bg-gray-800 border border-gray-700"
+                          />
+                      </div>
+                      <div>
+                          <label htmlFor="video-bg-color" className="block text-sm font-medium text-gray-400 mb-2">Background</label>
+                          <input
+                              type="color"
+                              id="video-bg-color"
+                              value={subtitleBgColor}
+                              onChange={(e) => setSubtitleBgColor(e.target.value)}
+                              className="w-full h-10 rounded-lg cursor-pointer bg-gray-800 border border-gray-700"
+                          />
+                      </div>
+                      
+                      {subtitleBgColor !== 'transparent' && (
+                        <div className="col-span-2">
+                           <label className="block text-sm font-medium text-gray-400 mb-2">Background Opacity ({Math.round(bgOpacity * 100)}%)</label>
+                            <input 
+                                type="range" 
+                                min="0" 
+                                max="1" 
+                                step="0.1" 
+                                value={bgOpacity} 
+                                onChange={e => setBgOpacity(Number(e.target.value))} 
+                                className="w-full accent-blue-500" 
+                            />
+                        </div>
+                      )}
+                    </>
+                  )}
               </div>
 
               <div>
@@ -579,6 +644,24 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
                           className="w-full"
                       />
                   <div className="text-xs text-gray-500 mt-1 text-center">{subtitleFontSize}px</div>
+              </div>
+
+
+
+              <div>
+                  <label htmlFor="video-font" className="block text-sm font-medium text-gray-400 mb-2">Font Family</label>
+                  <select
+                      id="video-font"
+                      value={subtitleFont}
+                      onChange={(e) => setSubtitleFont(e.target.value)}
+                      className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-sm text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                  >
+                      {FONT_OPTIONS.map(font => (
+                          <option key={font.value} value={font.value} style={{ fontFamily: font.value }}>
+                              {font.label}
+                          </option>
+                      ))}
+                  </select>
               </div>
 
               <div>
@@ -679,7 +762,10 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
                  bg_color: subtitleBgColor,
                  position: subtitlePosition,
                  font_size: subtitleFontSize,
-                 width_percent: subtitleWidth,
+                 font: subtitleFont,
+                 width: subtitleWidth, // Note: width_percent was used in PresetForm? Check props.
+                 show: showSubtitle,
+                 bg_opacity: bgOpacity,
                },
                language: subtitleLanguage,
                voice_code: subtitleVoiceCode,

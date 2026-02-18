@@ -259,7 +259,7 @@ const DepositPage = () => {
               <ShieldCheck size={14} className="text-green-400" />
               <p>Thanh toán được xử lý an toàn 100% bởi <span className="text-white font-bold tracking-wider">PayOS</span></p>
            </div>
-           <p className="text-xs opacity-50">Hệ thống tự động cộng tiền sau 3-5 giây kể từ khi giao dịch thành công</p>
+           <p className="text-xs text-black font-medium opacity-80">Hệ thống tự động cộng tiền sau 3-5 giây kể từ khi giao dịch thành công</p>
          </div>
       </div>
     </div>

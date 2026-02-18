@@ -12,6 +12,19 @@ interface VbeeVoice {
   demo: string;
 }
 
+const FONT_OPTIONS = [
+  { label: 'Arial (Sans-serif)', value: 'Arial' },
+  { label: 'Times New Roman (Serif)', value: 'Times New Roman' },
+  { label: 'Courier New (Monospace)', value: 'Courier New' },
+  { label: 'Verdana', value: 'Verdana' },
+  { label: 'Tahoma', value: 'Tahoma' },
+  { label: 'Trebuchet MS', value: 'Trebuchet MS' },
+  { label: 'Georgia', value: 'Georgia' },
+  { label: 'Garamond', value: 'Garamond' },
+  { label: 'Impact', value: 'Impact' },
+  { label: 'Comic Sans MS', value: 'Comic Sans MS' },
+];
+
 interface PresetFormProps {
   initialData?: any;
   onSave: () => void;
@@ -28,6 +41,9 @@ const PresetForm: React.FC<PresetFormProps> = ({ initialData, onSave, onCancel }
   const [subtitleBgColor, setSubtitleBgColor] = useState(initialData?.config?.subtitle?.bg_color || 'transparent');
   const [subtitleFontSize, setSubtitleFontSize] = useState(initialData?.config?.subtitle?.font_size || 21);
   const [subtitleWidth, setSubtitleWidth] = useState(initialData?.config?.subtitle?.width || 300);
+  const [subtitleFont, setSubtitleFont] = useState(initialData?.config?.subtitle?.font || 'Arial');
+  const [showSubtitle, setShowSubtitle] = useState(initialData?.config?.subtitle?.show !== false); // Default true
+  const [bgOpacity, setBgOpacity] = useState(initialData?.config?.subtitle?.bg_opacity ?? 1); // Default 1
   const [language, setLanguage] = useState(initialData?.config?.language || 'vietnamese');
   const [voiceCode, setVoiceCode] = useState(initialData?.config?.voice_code || '');
   const [voices, setVoices] = useState<VbeeVoice[]>([]);
@@ -219,6 +235,8 @@ const PresetForm: React.FC<PresetFormProps> = ({ initialData, onSave, onCancel }
           height: logoRef.current?.getBoundingClientRect().height || 0
         } : undefined,
         subtitle: {
+          show: showSubtitle,
+          bg_opacity: bgOpacity,
           color: subtitleColor,
           bg_color: subtitleBgColor,
           position: 'bottom',
@@ -228,6 +246,7 @@ const PresetForm: React.FC<PresetFormProps> = ({ initialData, onSave, onCancel }
           y: subtitlePos.y,
           font_size: subtitleFontSize,
           width: subtitleWidth,
+          font: subtitleFont,
           height: subtitleRef.current?.offsetHeight || 0,
         },
         language: language,
@@ -347,9 +366,17 @@ const PresetForm: React.FC<PresetFormProps> = ({ initialData, onSave, onCancel }
                                 borderRadius: '4px',
                                 color: subtitleColor, 
                                 fontSize: `${subtitleFontSize}px`,
-                                backgroundColor: subtitleBgColor,
+                                fontFamily: subtitleFont,
+                                backgroundColor: subtitleBgColor === 'transparent' 
+                                    ? 'transparent' 
+                                    : (subtitleBgColor.startsWith('#') 
+                                        ? `rgba(${parseInt(subtitleBgColor.slice(1,3),16)}, ${parseInt(subtitleBgColor.slice(3,5),16)}, ${parseInt(subtitleBgColor.slice(5,7),16)}, ${bgOpacity})`
+                                        : subtitleBgColor),
+                                backdropFilter: subtitleBgColor !== 'transparent' && bgOpacity < 1 ? 'blur(10px)' : 'none',
+                                WebkitBackdropFilter: subtitleBgColor !== 'transparent' && bgOpacity < 1 ? 'blur(10px)' : 'none',
                                 fontWeight: 'bold',
                                 textAlign: 'center',
+                                display: showSubtitle ? 'block' : 'none'
                             }}
                          >
                             <div className="absolute inset-0 border-2 border-dashed border-green-500 opacity-0 group-hover/sub:opacity-100 transition-opacity rounded pointer-events-none" />
@@ -445,30 +472,84 @@ const PresetForm: React.FC<PresetFormProps> = ({ initialData, onSave, onCancel }
                     </div>
                  </div>
 
-                 {/* Colors */}
-                 <div className="grid grid-cols-2 gap-3">
-                     <div>
-                        <label htmlFor="preset-text-color" className="block text-sm font-medium text-gray-400 mb-2">Text Color</label>
-                        <div className="h-10 bg-gray-800 rounded-lg border border-gray-700 flex items-center px-1 cursor-pointer relative overflow-hidden">
-                             <input type="color" id="preset-text-color" value={subtitleColor} onChange={e => setSubtitleColor(e.target.value)} className="w-full h-full opacity-0 absolute inset-0 cursor-pointer" />
-                             <div className="w-full h-8 rounded border border-gray-600 shadow-sm" style={{ backgroundColor: subtitleColor }} />
-                        </div>
-                     </div>
-                     <div>
-                        <label htmlFor="preset-bg-color" className="block text-sm font-medium text-gray-400 mb-2">Background</label>
-                        <div className="h-10 bg-gray-800 rounded-lg border border-gray-700 flex items-center px-1 cursor-pointer relative overflow-hidden">
-                             <input type="color" id="preset-bg-color" value={subtitleBgColor} onChange={e => setSubtitleBgColor(e.target.value)} className="w-full h-full opacity-0 absolute inset-0 cursor-pointer" />
-                             <div className="w-full h-8 rounded border border-gray-600 shadow-sm" style={{ backgroundColor: subtitleBgColor === 'transparent' ? 'transparent' : subtitleBgColor }} />
-                        </div>
-                     </div>
+                 {/* Subtitle Toggle */}
+                 <div className="flex items-center justify-between border-b border-gray-800 pb-4">
+                    <span className="text-sm font-medium text-gray-300">Show Subtitles</span>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" checked={showSubtitle} onChange={e => setShowSubtitle(e.target.checked)} className="sr-only peer" />
+                        <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
                  </div>
 
-                 {/* Font Size */}
-                 <div>
-                    <label htmlFor="font-size" className="block text-sm font-medium text-gray-400 mb-2">Font Size</label>
-                    <input type="range" id="font-size" min="16" max="48" value={subtitleFontSize} onChange={e => setSubtitleFontSize(Number(e.target.value))} className="w-full accent-blue-500" />
-                    <div className="text-xs text-gray-500 mt-1 text-center">{subtitleFontSize}px</div>
-                 </div>
+                 {showSubtitle && (
+                     <>
+                        {/* Colors */}
+                        <div className="grid grid-cols-2 gap-3">
+                             <div>
+                                <label htmlFor="preset-text-color" className="block text-sm font-medium text-gray-400 mb-2">Text Color</label>
+                                <div className="h-10 bg-gray-800 rounded-lg border border-gray-700 flex items-center px-1 cursor-pointer relative overflow-hidden">
+                                     <input type="color" id="preset-text-color" value={subtitleColor} onChange={e => setSubtitleColor(e.target.value)} className="w-full h-full opacity-0 absolute inset-0 cursor-pointer" />
+                                     <div className="w-full h-8 rounded border border-gray-600 shadow-sm" style={{ backgroundColor: subtitleColor }} />
+                                </div>
+                             </div>
+                             <div>
+                                <label htmlFor="preset-bg-color" className="block text-sm font-medium text-gray-400 mb-2">Background</label>
+                                <div className="h-10 bg-gray-800 rounded-lg border border-gray-700 flex items-center px-1 cursor-pointer relative overflow-hidden">
+                                     <input type="color" id="preset-bg-color" value={subtitleBgColor} onChange={e => setSubtitleBgColor(e.target.value)} className="w-full h-full opacity-0 absolute inset-0 cursor-pointer" />
+                                     <div 
+                                        className="w-full h-8 rounded border border-gray-600 shadow-sm" 
+                                        style={{ 
+                                            backgroundColor: subtitleBgColor === 'transparent' ? '#1f2937' : subtitleBgColor,
+                                            backgroundImage: subtitleBgColor === 'transparent' ? 'linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc), linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc)' : 'none',
+                                            backgroundSize: '10px 10px',
+                                            backgroundPosition: '0 0, 5px 5px'
+                                        }} 
+                                     />
+                                </div>
+                             </div>
+                        </div>
+
+                         {/* Background Opacity */}
+                         {subtitleBgColor !== 'transparent' && (
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-2">Background Opacity ({Math.round(bgOpacity * 100)}%)</label>
+                                <input 
+                                    type="range" 
+                                    min="0" 
+                                    max="1" 
+                                    step="0.1" 
+                                    value={bgOpacity} 
+                                    onChange={e => setBgOpacity(Number(e.target.value))} 
+                                    className="w-full accent-blue-500" 
+                                />
+                            </div>
+                         )}
+
+                         {/* Font Size */}
+                         <div>
+                            <label htmlFor="font-size" className="block text-sm font-medium text-gray-400 mb-2">Font Size</label>
+                            <input type="range" id="font-size" min="16" max="48" value={subtitleFontSize} onChange={e => setSubtitleFontSize(Number(e.target.value))} className="w-full accent-blue-500" />
+                            <div className="text-xs text-gray-500 mt-1 text-center">{subtitleFontSize}px</div>
+                         </div>
+
+                         {/* Font Family */}
+                         <div>
+                             <label htmlFor="font-family" className="block text-sm font-medium text-gray-400 mb-2">Font Family</label>
+                             <select
+                                 id="font-family"
+                                 value={subtitleFont}
+                                 onChange={(e) => setSubtitleFont(e.target.value)}
+                                 className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-sm text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                             >
+                                 {FONT_OPTIONS.map(font => (
+                                     <option key={font.value} value={font.value} style={{ fontFamily: font.value }}>
+                                         {font.label}
+                                     </option>
+                                 ))}
+                             </select>
+                         </div>
+                     </>
+                 )}
 
                  {/* Language */}
                  <div>
