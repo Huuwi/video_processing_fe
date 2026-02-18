@@ -4,7 +4,7 @@ import VideoItem from '../components/VideoItem';
 import VideoEditor from '../components/VideoEditor';
 import { useAuth } from '../contexts/AuthContext';
 import DashboardLayout from '../layouts/DashboardLayout';
-import { Plus, Link as LinkIcon, Settings, Wand2, Search, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { Plus, Link as LinkIcon, Settings, Wand2, Search, ChevronLeft, ChevronRight, X, Info } from 'lucide-react';
 import axiosClient from '../api/axiosClient';
 import AutoEditModal from '../components/AutoEditModal';
 import PresetManager from '../components/PresetManager';
@@ -128,7 +128,7 @@ function DashboardPage() {
 
   const handleSelectAll = () => {
     const editableVideos = videos.filter(v => v.stage === 'user_editing' || v.stage === 'download').map(v => v._id);
-    if (selectedVideos.length === editableVideos.length) {
+    if (selectedVideos.length > 0) {
       setSelectedVideos([]);
     } else {
       setSelectedVideos(editableVideos);
@@ -150,17 +150,34 @@ function DashboardPage() {
 
   const renderDashboard = () => (
     <div className="space-y-8">
-         {/* Retention Warning */}
-         <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 flex items-start gap-3">
-            <div className="text-yellow-500 shrink-0 mt-0.5">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
-            </div>
-            <div>
-                <h4 className="text-yellow-500 font-medium text-sm">Lưu ý quan trọng</h4>
-                <p className="text-yellow-500/80 text-sm mt-0.5">
-                    Hệ thống sẽ tự động xóa các video và tệp tin liên quan sau <span className="font-bold text-yellow-400">3 ngày</span> kể từ khi tạo.Vui lòng tải xuống kết quả của bạn sớm nhất có thể.
-                </p>
-            </div>
+         {/* Retention Warning & Watermark Info */}
+         <div className="space-y-4">
+             {user && (user.total_deposited_vnd || 0) <= 0 && (
+                <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 flex items-start gap-3">
+                    <div className="text-blue-500 shrink-0 mt-0.5">
+                        <Info size={20} />
+                    </div>
+                    <div>
+                        <h4 className="text-blue-500 font-medium text-sm">Thông báo Watermark</h4>
+                        <p className="text-blue-500/80 text-sm mt-0.5">
+                            Video tạo bằng gói miễn phí sẽ có <span className="font-bold">Watermark</span>. 
+                            Nạp gói bất kỳ để xóa Watermark và mở khóa tính năng cao cấp.
+                        </p>
+                    </div>
+                </div>
+             )}
+
+             <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 flex items-start gap-3">
+                <div className="text-yellow-500 shrink-0 mt-0.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                </div>
+                <div>
+                    <h4 className="text-yellow-500 font-medium text-sm">Lưu ý quan trọng</h4>
+                    <p className="text-yellow-500/80 text-sm mt-0.5">
+                        Hệ thống sẽ tự động xóa các video và tệp tin liên quan sau <span className="font-bold text-yellow-400">3 ngày</span> kể từ khi tạo.Vui lòng tải xuống kết quả của bạn sớm nhất có thể.
+                    </p>
+                </div>
+             </div>
          </div>
 
          {/* Header Section */}

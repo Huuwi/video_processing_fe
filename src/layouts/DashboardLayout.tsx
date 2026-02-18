@@ -2,7 +2,7 @@
 import { type ReactNode, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
-import { LogOut, Home, Info, Shield, FileText, Menu, X, Mail, Clock, CreditCard } from 'lucide-react';
+import { LogOut, Home, Info, Shield, FileText, Menu, X, Mail, Clock, CreditCard, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 interface DashboardLayoutProps {
@@ -12,6 +12,7 @@ interface DashboardLayoutProps {
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const { user, logout } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isDesktopCollapsed, setIsDesktopCollapsed] = useState(false);
   const location = useLocation();
 
   const navItems = [
@@ -41,96 +42,116 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       {/* Sidebar */}
       <aside 
         className={`
-          fixed lg:static inset-y-0 left-0 z-50 w-64 bg-gray-900 border-r border-gray-800 
-          transform transition-transform duration-300 ease-in-out
+          fixed lg:static inset-y-0 left-0 z-50 bg-gray-900 border-r border-gray-800 
+          transform transition-all duration-300 ease-in-out
           ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+          ${isDesktopCollapsed ? 'lg:w-20' : 'lg:w-64'}
+          w-64
         `}
       >
-        <div className="p-6 flex items-center justify-between">
-          <Link to="/dashboard" className="flex items-center gap-4 group">
+        <div className="p-6 flex items-center justify-between h-20">
+          <Link to="/dashboard" className={`flex items-center gap-4 group transition-all duration-300 ${isDesktopCollapsed ? 'scale-0 w-0 opacity-0 hidden' : 'scale-100 w-auto opacity-100'}`}>
             {/* <img 
               src="/logo.png" 
               alt="Z-Video Logo" 
               className="w-24 h-24 object-contain group-hover:scale-105 transition-transform duration-300" 
             /> */}
-            <h1 className="text-4xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
+            <h1 className="text-4xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500 whitespace-nowrap">
               Z-Video
             </h1>
           </Link>
+          
+          {/* Mobile Close Button */}
           <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-gray-400 hover:text-white">
             <X size={24} />
           </button>
+
+           {/* Desktop Collapse Button */}
+           <button 
+             onClick={() => setIsDesktopCollapsed(!isDesktopCollapsed)} 
+             className={`hidden lg:flex items-center justify-center text-gray-400 hover:text-white transition-all duration-300 ${isDesktopCollapsed ? 'w-full' : ''}`}
+           >
+             {isDesktopCollapsed ? <ChevronRight size={24} /> : <ChevronLeft size={24} />}
+           </button>
         </div>
 
-        <nav className="mt-6 px-4 space-y-2">
+        <nav className="mt-6 px-2 space-y-2">
           {navItems.map((item) => {
              const isActive = location.pathname === item.path;
              return (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                onClick={() => setIsSidebarOpen(false)} // Close on mobile when clicked
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all overflow-hidden ${
                   isActive 
                     ? 'bg-gradient-to-r from-blue-600/20 to-purple-600/20 text-blue-400 border border-blue-500/30' 
                     : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-                }`}
+                } ${isDesktopCollapsed ? 'justify-center px-2' : ''}`}
+                title={isDesktopCollapsed ? item.label : ''}
               >
-                <item.icon size={20} />
-                <span className="font-medium">{item.label}</span>
+                <item.icon size={20} className="shrink-0" />
+                <span className={`font-medium transition-all duration-200 whitespace-nowrap ${isDesktopCollapsed ? 'w-0 opacity-0 hidden' : 'w-auto opacity-100'}`}>
+                  {item.label}
+                </span>
               </Link>
              );
           })}
         </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-800">
-           <div className="flex flex-col gap-3 px-4 py-3">
-              <div className="flex items-center gap-3 text-gray-400">
-                <div className="w-10 h-10 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold overflow-hidden">
-                    {user?.avatar ? (
-                        <img src={user.avatar} alt={user.nickname} className="w-full h-full object-cover" />
-                    ) : (
-                        user?.nickname?.[0] || user?.username?.[0] || 'U'
-                    )}
-                </div>
-                <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-white truncate">{user?.nickname || user?.username}</p>
-                    <p className="text-xs truncate flex items-center gap-1">
-                      <span className={`w-1.5 h-1.5 rounded-full ${user?.vip ? 'bg-yellow-400' : 'bg-gray-500'}`}></span>
-                      {user?.vip ? 'VIP Member' : 'Standard Plan'}
-                    </p>
-                </div>
-              </div>
-              
-              <div className="space-y-2 mt-1">
-                <div className="flex items-center gap-2 text-xs text-gray-400 truncate">
-                  <Mail size={12} className="shrink-0" />
-                  <span className="truncate">{user?.mail || 'No email'}</span>
-                </div>
-                <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2 text-gray-400">
-                    <Clock size={12} />
-                    <span>Time Left</span>
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-800 bg-gray-900">
+           {!isDesktopCollapsed && (
+             <div className="flex flex-col gap-3 px-4 py-3 animate-in fade-in duration-300">
+                <div className="flex items-center gap-3 text-gray-400">
+                  <div className="w-10 h-10 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold overflow-hidden">
+                      {user?.avatar ? (
+                          <img src={user.avatar} alt={user.nickname} className="w-full h-full object-cover" />
+                      ) : (
+                          user?.nickname?.[0] || user?.username?.[0] || 'U'
+                      )}
                   </div>
-                  <span className="text-blue-400 font-medium font-mono">{formatTime(user?.remaining_time_ms)}</span>
-                </div>
-                <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2 text-gray-400">
-                    <CreditCard size={12} />
-                    <span>Balance</span>
+                  <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-white truncate">{user?.nickname || user?.username}</p>
+                      <p className="text-xs truncate flex items-center gap-1">
+                        <span className={`w-1.5 h-1.5 rounded-full ${user?.vip ? 'bg-yellow-400' : 'bg-gray-500'}`}></span>
+                        {user?.vip ? 'VIP Member' : 'Standard Plan'}
+                      </p>
                   </div>
-                  <span className="text-purple-400 font-medium">${user?.balance?.toFixed(2) || '0.00'}</span>
                 </div>
-              </div>
-           </div>
+                
+                <div className="space-y-2 mt-1">
+                  <div className="flex items-center gap-2 text-xs text-gray-400 truncate">
+                    <Mail size={12} className="shrink-0" />
+                    <span className="truncate">{user?.mail || 'No email'}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2 text-gray-400">
+                      <Clock size={12} />
+                      <span>Time</span>
+                    </div>
+                    <span className="text-blue-400 font-medium font-mono">{formatTime(user?.remaining_time_ms)}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2 text-gray-400">
+                      <CreditCard size={12} />
+                      <span>Bal</span>
+                    </div>
+                    <span className="text-purple-400 font-medium">${user?.balance?.toFixed(2) || '0.00'}</span>
+                  </div>
+                </div>
+             </div>
+           )}
+           
            <button 
              onClick={() => {
                logout();
                toast.success('Logged out successfully');
              }}
-             className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold text-red-400 hover:text-white bg-red-500/5 hover:bg-red-500 rounded-xl transition-all border border-red-500/20 hover:border-red-500 shadow-lg shadow-red-500/5 hover:shadow-red-500/20 active:scale-95"
+             className={`w-full mt-4 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold text-red-500 hover:text-white bg-red-500/5 hover:bg-red-500 rounded-xl transition-all border border-red-500/20 hover:border-red-500 shadow-lg shadow-red-500/5 hover:shadow-red-500/20 active:scale-95 ${isDesktopCollapsed ? 'px-2' : ''}`}
+             title={isDesktopCollapsed ? 'Sign Out' : ''}
            >
              <LogOut size={16} />
-             Sign Out
+             {!isDesktopCollapsed && <span>Sign Out</span>}
            </button>
         </div>
       </aside>

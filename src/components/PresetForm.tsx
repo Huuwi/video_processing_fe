@@ -41,11 +41,29 @@ const PresetForm: React.FC<PresetFormProps> = ({ initialData, onSave, onCancel }
 
   // Logo settings
   const [logoFile, setLogoFile] = useState<File | null>(null);
+  
+  const getInitialLogoKey = () => {
+      if (!initialData?.config?.logo) return '';
+      // Handle both old string format and new object format
+      return typeof initialData.config.logo === 'string' 
+          ? initialData.config.logo 
+          : initialData.config.logo.file_key || '';
+  };
+
+  const initialLogoKey = getInitialLogoKey();
+
   const [logoPreview, setLogoPreview] = useState<string | null>(
-    initialData?.config?.logo ? `${import.meta.env.VITE_API_URL}/files/${initialData.config.logo}` : null
+    initialLogoKey ? `${import.meta.env.VITE_API_URL}/files/${initialLogoKey}` : null
   );
-  const [logoFileKey, setLogoFileKey] = useState<string>(initialData?.config?.logo || '');
-  const [logoScale, setLogoScale] = useState(initialData?.config?.logo_scale || 1);
+  const [logoFileKey, setLogoFileKey] = useState<string>(initialLogoKey);
+  
+  const getInitialLogoScale = () => {
+      if (initialData?.config?.logo?.scale) return initialData.config.logo.scale;
+      if (initialData?.config?.logo_scale) return initialData.config.logo_scale;
+      return 1;
+  };
+
+  const [logoScale, setLogoScale] = useState(getInitialLogoScale());
 
   const [isLoading, setIsLoading] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -64,8 +82,18 @@ const PresetForm: React.FC<PresetFormProps> = ({ initialData, onSave, onCancel }
         }
 
         if (initialData.config.logo) {
-             const lx = (initialData.config.logo_x / 100) * width;
-             const ly = (initialData.config.logo_y / 100) * height;
+             let lx = 0;
+             let ly = 0;
+             
+             if (typeof initialData.config.logo === 'object' && initialData.config.logo.position_x !== undefined) {
+                 lx = (initialData.config.logo.position_x / 100) * width;
+                 ly = (initialData.config.logo.position_y / 100) * height;
+             } else if (initialData.config.logo_x !== undefined) {
+                 // Fallback for flat structure
+                 lx = (initialData.config.logo_x / 100) * width;
+                 ly = (initialData.config.logo_y / 100) * height;
+             }
+             
              setLogoPos({ x: lx || 0, y: ly || 0 });
         }
     }

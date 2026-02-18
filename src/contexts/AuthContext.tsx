@@ -13,6 +13,7 @@ interface User {
   remaining_time_ms?: number;
   phone?: string;
   avatar?: string;
+  total_deposited_vnd?: number;
 }
 
 interface AuthContextType {
