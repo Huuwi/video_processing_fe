@@ -20,7 +20,7 @@ const AboutPage = () => {
           
           <h2 className="text-xl font-semibold text-white mt-8">Sứ mệnh của chúng tôi</h2>
           <p>
-            Z-video được sinh ra với sứ mệnh tối ưu hóa thời gian và quy trình sản xuất video cho người dùng. Chúng tôi mong muốn giúp bạn biến những video thô từ Douyin, TikTok trở thành những tác phẩm hoàn thiện một cách nhanh chóng nhất.
+            Z-video được sinh ra với sứ mệnh tối ưu hóa thời gian và quy trình sản xuất video cho người dùng. Chúng tôi mong muốn giúp bạn biến những video thô từ Douyin, Bilibili trở thành những tác phẩm hoàn thiện một cách nhanh chóng nhất.
           </p>
 
           <h2 className="text-xl font-semibold text-white mt-8">Tính năng cốt lõi</h2>
