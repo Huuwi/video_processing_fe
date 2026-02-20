@@ -41,6 +41,7 @@ const PresetForm: React.FC<PresetFormProps> = ({ initialData, onSave, onCancel }
   const [subtitleBgColor, setSubtitleBgColor] = useState(initialData?.config?.subtitle?.bg_color || 'transparent');
   const [subtitleFontSize, setSubtitleFontSize] = useState(initialData?.config?.subtitle?.font_size || 21);
   const [subtitleWidth, setSubtitleWidth] = useState(initialData?.config?.subtitle?.width || 300);
+  const [subtitleHeight, setSubtitleHeight] = useState(initialData?.config?.subtitle?.height || 50);
   const [subtitleFont, setSubtitleFont] = useState(initialData?.config?.subtitle?.font || 'Arial');
   const [showSubtitle, setShowSubtitle] = useState(initialData?.config?.subtitle?.show !== false); // Default true
   const [bgOpacity, setBgOpacity] = useState(initialData?.config?.subtitle?.bg_opacity ?? 1); // Default 1
@@ -246,8 +247,8 @@ const PresetForm: React.FC<PresetFormProps> = ({ initialData, onSave, onCancel }
           y: subtitlePos.y,
           font_size: subtitleFontSize,
           width: subtitleWidth,
+          height: subtitleHeight,
           font: subtitleFont,
-          height: subtitleRef.current?.offsetHeight || 0,
         },
         language: language,
         voice_code: voiceCode,
@@ -362,6 +363,7 @@ const PresetForm: React.FC<PresetFormProps> = ({ initialData, onSave, onCancel }
                             className="absolute cursor-move z-20 hover:ring-2 hover:ring-green-500 rounded p-2 transition-all group/sub"
                             style={{
                                 width: `${subtitleWidth}px`,
+                                minHeight: `${subtitleHeight}px`,
                                 padding: '8px 16px',
                                 borderRadius: '4px',
                                 color: subtitleColor, 
@@ -376,7 +378,9 @@ const PresetForm: React.FC<PresetFormProps> = ({ initialData, onSave, onCancel }
                                 WebkitBackdropFilter: subtitleBgColor !== 'transparent' && bgOpacity < 1 ? 'blur(10px)' : 'none',
                                 fontWeight: 'bold',
                                 textAlign: 'center',
-                                display: showSubtitle ? 'block' : 'none'
+                                display: showSubtitle ? 'flex' : 'none',
+                                alignItems: 'center',
+                                justifyContent: 'center',
                             }}
                          >
                             <div className="absolute inset-0 border-2 border-dashed border-green-500 opacity-0 group-hover/sub:opacity-100 transition-opacity rounded pointer-events-none" />
@@ -530,6 +534,21 @@ const PresetForm: React.FC<PresetFormProps> = ({ initialData, onSave, onCancel }
                             <label htmlFor="font-size" className="block text-sm font-medium text-gray-400 mb-2">Font Size</label>
                             <input type="range" id="font-size" min="16" max="48" value={subtitleFontSize} onChange={e => setSubtitleFontSize(Number(e.target.value))} className="w-full accent-blue-500" />
                             <div className="text-xs text-gray-500 mt-1 text-center">{subtitleFontSize}px</div>
+                         </div>
+
+                         {/* Subtitle Height */}
+                         <div>
+                            <label htmlFor="subtitle-height" className="block text-sm font-medium text-gray-400 mb-2">Subtitle Box Height ({subtitleHeight}px)</label>
+                            <input
+                              type="range"
+                              id="subtitle-height"
+                              min="30"
+                              max="200"
+                              step="5"
+                              value={subtitleHeight}
+                              onChange={e => setSubtitleHeight(Number(e.target.value))}
+                              className="w-full accent-blue-500"
+                            />
                          </div>
 
                          {/* Font Family */}

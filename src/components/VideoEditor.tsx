@@ -61,6 +61,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
   const [playingDemo, setPlayingDemo] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [subtitleWidth, setSubtitleWidth] = useState<number>(300);
+  const [subtitleHeight, setSubtitleHeight] = useState<number>(50);
   const [showSubtitle, setShowSubtitle] = useState(true);
   const [bgOpacity, setBgOpacity] = useState(1);
   
@@ -159,6 +160,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
     setSubtitleFontSize(21);
     setSubtitleFont('Arial');
     setSubtitleWidth(300);
+    setSubtitleHeight(50);
     setShowSubtitle(true);
 
     
@@ -253,7 +255,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
             x: subtitlePos.x,
             y: subtitlePos.y,
             width: subtitleWidth,
-            height: subtitleNodeRef.current?.offsetHeight || 0,
+            height: subtitleHeight,
             font_size: subtitleFontSize,
             show: showSubtitle,
             bg_opacity: bgOpacity,
@@ -320,7 +322,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
             x: subtitlePos.x,
             y: subtitlePos.y,
             width: subtitleWidth,
-            height: subtitleNodeRef.current?.offsetHeight || 0,
+            height: subtitleHeight,
             font_size: subtitleFontSize,
             show: showSubtitle,
             bg_opacity: bgOpacity,
@@ -467,6 +469,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
                         className="cursor-move group relative pointer-events-auto"
                         style={{
                             width: `${subtitleWidth}px`,
+                            minHeight: `${subtitleHeight}px`,
                             padding: '8px 16px',
                             borderRadius: '4px',
                             fontSize: `${subtitleFontSize}px`,
@@ -481,8 +484,10 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
                             WebkitBackdropFilter: subtitleBgColor !== 'transparent' && bgOpacity < 1 ? 'blur(10px)' : 'none',
                             fontWeight: 'bold',
                             textAlign: 'center',
+                            display: showSubtitle ? 'flex' : 'none',
+                            alignItems: 'center',
+                            justifyContent: 'center',
                             position: 'relative',
-                            display: showSubtitle ? 'block' : 'none'
                         }}
                     >
                         <div className="absolute inset-0 border-2 border-dashed border-green-500 opacity-0 group-hover:opacity-100 transition-opacity rounded pointer-events-none" />
@@ -644,6 +649,21 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
                           className="w-full"
                       />
                   <div className="text-xs text-gray-500 mt-1 text-center">{subtitleFontSize}px</div>
+              </div>
+
+              {/* Subtitle Height */}
+              <div>
+                  <label htmlFor="video-height" className="block text-sm font-medium text-gray-400 mb-2">Subtitle Box Height ({subtitleHeight}px)</label>
+                  <input
+                      type="range"
+                      id="video-height"
+                      min="30"
+                      max="200"
+                      step="5"
+                      value={subtitleHeight}
+                      onChange={(e) => setSubtitleHeight(Number(e.target.value))}
+                      className="w-full accent-blue-500"
+                  />
               </div>
 
 
