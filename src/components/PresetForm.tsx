@@ -73,6 +73,15 @@ const PresetForm: React.FC<PresetFormProps> = ({ initialData, onSave, onCancel }
     initialLogoKey ? `${import.meta.env.VITE_API_URL}/files/${initialLogoKey}` : null
   );
   const [logoFileKey, setLogoFileKey] = useState<string>(initialLogoKey);
+
+  // Background Music settings
+  const [bgMusicFile, setBgMusicFile] = useState<File | null>(null);
+  const [bgMusicFileKey, setBgMusicFileKey] = useState<string>(initialData?.config?.bg_music?.file_key || '');
+  const [bgMusicName, setBgMusicName] = useState<string>(
+    initialData?.config?.bg_music?.file_key
+      ? (initialData.config.bg_music.file_key.split('/').pop() || 'audio file')
+      : ''
+  );
   
   const getInitialLogoScale = () => {
       if (initialData?.config?.logo?.scale) return initialData.config.logo.scale;
@@ -164,6 +173,17 @@ const PresetForm: React.FC<PresetFormProps> = ({ initialData, onSave, onCancel }
     setLogoFile(file);
     setLogoPreview(URL.createObjectURL(file));
   };
+
+  const handleBgMusicUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.name.toLowerCase().endsWith('.mp3')) {
+      toast.error('Chỉ chấp nhận file MP3');
+      return;
+    }
+    setBgMusicFile(file);
+    setBgMusicName(file.name);
+  };
   
     const calculatePercentages = () => {
     if (containerRef.current) {
@@ -221,6 +241,28 @@ const PresetForm: React.FC<PresetFormProps> = ({ initialData, onSave, onCancel }
             return;
           }
       }
+
+      // Upload background music if new file selected
+      let finalBgMusicKey = bgMusicFileKey;
+      if (bgMusicFile) {
+          try {
+            const formData = new FormData();
+            formData.append('file', bgMusicFile);
+            const res = await axios.post(`${import.meta.env.VITE_API_URL}/files/upload`, formData, {
+              headers: { 
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data'
+              }
+            });
+            finalBgMusicKey = res.data.key;
+            setBgMusicFileKey(finalBgMusicKey);
+          } catch (err) {
+            console.error('Failed to upload background music:', err);
+            toast.error('Failed to upload background music');
+            setIsLoading(false);
+            return;
+          }
+      }
       
       const { subX, subY, logoX, logoY } = calculatePercentages();
 
@@ -235,6 +277,7 @@ const PresetForm: React.FC<PresetFormProps> = ({ initialData, onSave, onCancel }
           width: logoRef.current?.getBoundingClientRect().width || 0,
           height: logoRef.current?.getBoundingClientRect().height || 0
         } : undefined,
+        bg_music: finalBgMusicKey ? { file_key: finalBgMusicKey } : undefined,
         subtitle: {
           show: showSubtitle,
           bg_opacity: bgOpacity,
@@ -463,6 +506,36 @@ const PresetForm: React.FC<PresetFormProps> = ({ initialData, onSave, onCancel }
                     )}
                  </div>
 
+                 {/* Background Music */}
+                 <div>
+                    <div className="flex items-center gap-2 text-gray-300 pb-2 mb-2 border-b border-gray-800">
+                        <h3 className="text-sm font-bold">Nhạc nền (MP3)</h3>
+                    </div>
+                    <label htmlFor="bg-music-upload" className="flex items-center justify-center w-full h-20 border-2 border-gray-700 border-dashed rounded-lg cursor-pointer hover:border-purple-500/50 hover:bg-gray-800/50 transition-all group relative">
+                        {bgMusicName ? (
+                            <div className="w-full h-full flex items-center justify-center px-3">
+                                <span className="text-xs text-purple-400 truncate">🎵 {bgMusicName}</span>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col items-center justify-center">
+                                <Upload className="w-6 h-6 mb-1 text-gray-500 group-hover:text-purple-400 transition-colors" />
+                                <p className="text-xs text-gray-500 group-hover:text-gray-300">Click to upload MP3</p>
+                            </div>
+                        )}
+                        <input type="file" id="bg-music-upload" className="hidden" onChange={handleBgMusicUpload} accept=".mp3,audio/mpeg" />
+                    </label>
+                    {bgMusicName && (
+                        <button
+                            type="button"
+                            onClick={() => { setBgMusicFile(null); setBgMusicFileKey(''); setBgMusicName(''); }}
+                            className="mt-2 w-full py-1.5 px-4 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-xs"
+                        >
+                            <X size={12} />
+                            Remove Music
+                        </button>
+                    )}
+                 </div>
+
                  {/* Aspect Ratio */}
                  <div>
                     <span className="block text-sm font-medium text-gray-400 mb-2">Aspect Ratio</span>
@@ -641,7 +714,7 @@ const PresetForm: React.FC<PresetFormProps> = ({ initialData, onSave, onCancel }
                         className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl font-bold transition-all shadow-lg shadow-blue-900/20 active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                      >
                         {isLoading ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
-                        Save Preset
+                        Save Template
                      </button>
                  </div>
             </div>

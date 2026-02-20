@@ -48,6 +48,11 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
   const [loadingVideo, setLoadingVideo] = useState(false);
   const [showSavePresetModal, setShowSavePresetModal] = useState(false);
 
+  // Background music
+  const [bgMusicFile, setBgMusicFile] = useState<File | null>(null);
+  const [bgMusicFileKey, setBgMusicFileKey] = useState<string>('');
+  const [bgMusicName, setBgMusicName] = useState<string>('');
+
   // Subtitle customization
   const [subtitleColor, setSubtitleColor] = useState<string>('#FFFFFF');
   const [subtitleBgColor, setSubtitleBgColor] = useState<string>('#000000');
@@ -169,6 +174,11 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
     setLogoFile(null);
     setLogoFileKey('');
     setLogoPos({ x: 0, y: 0 });
+
+    // Reset bg music
+    setBgMusicFile(null);
+    setBgMusicFileKey('');
+    setBgMusicName('');
   }, [aspectRatio]);
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -179,6 +189,17 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
     setLogoFile(file);
     const objectUrl = URL.createObjectURL(file);
     setLogoUrl(objectUrl);
+  };
+
+  const handleBgMusicUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.name.toLowerCase().endsWith('.mp3')) {
+      toast.error('Chỉ chấp nhận file MP3');
+      return;
+    }
+    setBgMusicFile(file);
+    setBgMusicName(file.name);
   };
 
   const handleDeleteLogo = () => {
@@ -231,6 +252,28 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
         }
       }
 
+      // Upload background music to MinIO if a new file was selected
+      let uploadedBgMusicKey = bgMusicFileKey;
+      if (bgMusicFile) {
+        try {
+          const formData = new FormData();
+          formData.append('file', bgMusicFile);
+          const token2 = localStorage.getItem('access_token');
+          const res = await axios.post(
+            `${import.meta.env.VITE_API_URL}/files/upload`,
+            formData,
+            { headers: { Authorization: `Bearer ${token2}`, 'Content-Type': 'multipart/form-data' } }
+          );
+          uploadedBgMusicKey = res.data.key;
+          setBgMusicFileKey(uploadedBgMusicKey);
+        } catch (err) {
+          console.error('Failed to upload background music:', err);
+          toast.error('Failed to upload background music');
+          setIsSaving(false);
+          return;
+        }
+      }
+
       const token = localStorage.getItem('access_token');
       
       // Batch edit mode: save to all selected videos
@@ -246,6 +289,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
             width: draggableNodeRef.current?.getBoundingClientRect().width || 0,
             height: draggableNodeRef.current?.getBoundingClientRect().height || 0
           } : undefined,
+          bg_music: uploadedBgMusicKey ? { file_key: uploadedBgMusicKey } : undefined,
           subtitle: {
             color: subtitleColor,
             bg_color: subtitleBgColor,
@@ -313,6 +357,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
             width: draggableNodeRef.current?.getBoundingClientRect().width || 0,
             height: draggableNodeRef.current?.getBoundingClientRect().height || 0
           } : undefined,
+          bg_music: uploadedBgMusicKey ? { file_key: uploadedBgMusicKey } : undefined,
           subtitle: {
             color: subtitleColor,
             bg_color: subtitleBgColor,
@@ -555,6 +600,34 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
                   )}
               </div>
 
+              {/* Background Music */}
+              <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">Nhạc nền (MP3)</label>
+                  <label htmlFor="video-bg-music-upload" className="flex items-center justify-center w-full h-20 border-2 border-gray-700 border-dashed rounded-lg cursor-pointer hover:border-purple-500/50 hover:bg-gray-800/50 transition-all group">
+                      {bgMusicName ? (
+                          <div className="w-full h-full flex items-center justify-center px-3">
+                              <span className="text-xs text-purple-400 truncate">🎵 {bgMusicName}</span>
+                          </div>
+                      ) : (
+                          <div className="flex flex-col items-center justify-center pt-4 pb-4">
+                              <Upload className="w-6 h-6 mb-1 text-gray-500 group-hover:text-purple-400 transition-colors" />
+                              <p className="text-sm text-gray-500 group-hover:text-gray-300">Click to upload MP3</p>
+                          </div>
+                      )}
+                      <input type="file" id="video-bg-music-upload" className="hidden" onChange={handleBgMusicUpload} accept=".mp3,audio/mpeg" />
+                  </label>
+                  {bgMusicName && (
+                      <button
+                          type="button"
+                          onClick={() => { setBgMusicFile(null); setBgMusicFileKey(''); setBgMusicName(''); }}
+                          className="mt-2 w-full py-2 px-4 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-sm"
+                      >
+                          <RotateCcw size={14} />
+                          Remove Music
+                      </button>
+                  )}
+              </div>
+
               <div>
                   <label className="block text-sm font-medium text-gray-400 mb-2">Aspect Ratio</label>
                   <div className="grid grid-cols-2 gap-2">
@@ -777,6 +850,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
                logo: logoFileKey, // Note: This might be empty if new logo uploaded but not saved yet. 
                                   // Ideally we should warn user or handle logo upload first if they want it in preset.
                                   // But for now we pass what we have.
+               bg_music: bgMusicFileKey ? { file_key: bgMusicFileKey } : undefined,
                subtitle: {
                  color: subtitleColor,
                  bg_color: subtitleBgColor,
