@@ -191,11 +191,18 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
     setLogoUrl(objectUrl);
   };
 
+  const MAX_AUDIO_SIZE_MB = 10;
+
   const handleBgMusicUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.name.toLowerCase().endsWith('.mp3')) {
       toast.error('Chỉ chấp nhận file MP3');
+      return;
+    }
+    if (file.size > MAX_AUDIO_SIZE_MB * 1024 * 1024) {
+      toast.error(`File quá lớn. Tối đa ${MAX_AUDIO_SIZE_MB}MB`);
+      e.target.value = '';
       return;
     }
     setBgMusicFile(file);
@@ -230,19 +237,26 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
     try {
       if (!video || (!video._id && !isBatchEdit)) return;
 
-      // Upload logo to MinIO if exists
+      // Upload logo via presigned PUT URL
       let uploadedLogoKey = logoFileKey;
       if (logoFile && !logoFileKey) {
         try {
-          const formData = new FormData();
-          formData.append('logo', logoFile);
           const token = localStorage.getItem('access_token');
-          const response = await axios.post(
-            `${import.meta.env.VITE_API_URL}/videos/${video._id}/upload-logo`,
-            formData,
-            { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' } }
+          // 1. Get presigned PUT URL
+          const presignRes = await axios.post(
+            `${import.meta.env.VITE_API_URL}/files/logo-presign-url`,
+            { filename: logoFile.name },
+            { headers: { Authorization: `Bearer ${token}` } }
           );
-          uploadedLogoKey = response.data.fileKey;
+          const { uploadUrl, fileKey } = presignRes.data;
+
+          // 2. PUT file directly to MinIO
+          const contentType = logoFile.type || 'image/png';
+          await axios.put(uploadUrl, logoFile, {
+            headers: { 'Content-Type': contentType },
+          });
+
+          uploadedLogoKey = fileKey;
           setLogoFileKey(uploadedLogoKey);
         } catch (err) {
           console.error('Failed to upload logo:', err);
@@ -252,19 +266,25 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
         }
       }
 
-      // Upload background music to MinIO if a new file was selected
+      // Upload background music via presigned PUT URL
       let uploadedBgMusicKey = bgMusicFileKey;
       if (bgMusicFile) {
         try {
-          const formData = new FormData();
-          formData.append('file', bgMusicFile);
           const token2 = localStorage.getItem('access_token');
-          const res = await axios.post(
-            `${import.meta.env.VITE_API_URL}/files/upload`,
-            formData,
-            { headers: { Authorization: `Bearer ${token2}`, 'Content-Type': 'multipart/form-data' } }
+          // 1. Get presigned PUT URL
+          const presignRes = await axios.post(
+            `${import.meta.env.VITE_API_URL}/files/audio-presign-url`,
+            { filename: bgMusicFile.name },
+            { headers: { Authorization: `Bearer ${token2}` } }
           );
-          uploadedBgMusicKey = res.data.key;
+          const { uploadUrl, fileKey } = presignRes.data;
+
+          // 2. PUT file directly to MinIO
+          await axios.put(uploadUrl, bgMusicFile, {
+            headers: { 'Content-Type': 'audio/mpeg' },
+          });
+
+          uploadedBgMusicKey = fileKey;
           setBgMusicFileKey(uploadedBgMusicKey);
         } catch (err) {
           console.error('Failed to upload background music:', err);
