@@ -108,15 +108,7 @@ function DashboardPage() {
       fetchVideos();
   };
 
-    const handleRetry = async (video: any) => {
-        try {
-            await axiosClient.post(`/videos/${video._id}/retry`);
-            fetchVideos();
-        } catch (err) {
-            console.error(err);
-            alert('Failed to retry');
-        }
-    };
+
 
   const handleToggleVideo = (videoId: string) => {
     setSelectedVideos(prev => 
@@ -329,7 +321,7 @@ function DashboardPage() {
                             key={v._id} 
                             video={v} 
                             onEdit={handleEdit}
-                            onRetry={handleRetry}
+
                             isSelected={selectedVideos.includes(v._id)}
                             onToggleSelect={handleToggleVideo}
                             onUpdate={(videoId, newTitle) => {

@@ -16,13 +16,12 @@ interface VideoProps {
         auto_edit?: boolean;
     };
     onEdit: (video: any) => void;
-    onRetry?: (video: any) => void;
     isSelected?: boolean;
     onToggleSelect?: (videoId: string) => void;
     onUpdate?: (videoId: string, newTitle: string) => void;
 }
 
-const VideoItem: React.FC<VideoProps> = ({ video, onEdit, onRetry, isSelected, onToggleSelect, onUpdate }) => {
+const VideoItem: React.FC<VideoProps> = ({ video, onEdit, isSelected, onToggleSelect, onUpdate }) => {
     const isReadyToEdit = video.stage === 'user_editing' && video.status !== 'failed';
     const [isEditingTitle, setIsEditingTitle] = React.useState(false);
     const [titleInput, setTitleInput] = React.useState(video.title || '');
@@ -79,25 +78,14 @@ const VideoItem: React.FC<VideoProps> = ({ video, onEdit, onRetry, isSelected, o
         <div className="group bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-blue-500/30 rounded-2xl p-4 transition-all hover:bg-gray-800/50 hover:shadow-lg hover:shadow-blue-500/5">
             <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0 flex items-center gap-4">
-                    {/* Retry button for failed videos */}
-                    {video.status === 'failed' && onRetry ? (
-                        <button 
-                            onClick={() => onRetry(video)}
-                            className="p-2 text-red-500 hover:text-white hover:bg-red-600 rounded-lg transition-colors shrink-0"
-                            title="Retry Processing"
-                        >
-                            <RotateCcw size={20} />
-                        </button>
-                    ) : (
-                        /* Checkbox for batch selection (only if not failed) */
-                        (video.stage === 'user_editing' || video.stage === 'download') && onToggleSelect && (
-                            <input
-                                type="checkbox"
-                                checked={isSelected || false}
-                                onChange={() => onToggleSelect && onToggleSelect(video._id)}
-                                className="w-5 h-5 rounded border-gray-700 bg-gray-800 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-900 cursor-pointer shrink-0"
-                            />
-                        )
+                    {/* Checkbox for batch selection */}
+                    {(video.stage === 'user_editing' || video.stage === 'download') && onToggleSelect && (
+                        <input
+                            type="checkbox"
+                            checked={isSelected || false}
+                            onChange={() => onToggleSelect && onToggleSelect(video._id)}
+                            className="w-5 h-5 rounded border-gray-700 bg-gray-800 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-900 cursor-pointer shrink-0"
+                        />
                     )}
                     <div className="w-12 h-12 rounded-xl bg-gray-800 flex items-center justify-center text-gray-500 group-hover:text-blue-400 transition-colors shrink-0">
                         <Film size={24} />
@@ -199,7 +187,7 @@ const VideoItem: React.FC<VideoProps> = ({ video, onEdit, onRetry, isSelected, o
                                     });
                                     toast.success('Auto-edit cancelled');
                                     // Optionally trigger a refresh or let the parent handle it
-                                    if(onRetry) onRetry(video); // Re-use onRetry to trigger fetch if available, or just rely on polling
+                                    // Opted to just rely on polling for refresh
                                 } catch (error) {
                                     console.error('Failed to cancel auto-edit', error);
                                     toast.error('Failed to cancel auto-edit');
