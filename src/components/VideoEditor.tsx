@@ -70,6 +70,10 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
   const [showSubtitle, setShowSubtitle] = useState(true);
   const [bgOpacity, setBgOpacity] = useState(1);
   
+  // Original Audio
+  const [keepOriginalAudio, setKeepOriginalAudio] = useState(false);
+  const [originalAudioMode, setOriginalAudioMode] = useState<'full' | 'bg_music_only'>('full');
+  
   // Title editing state
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [videoTitle, setVideoTitle] = useState(video?.title || 'Untitled Video');
@@ -179,6 +183,10 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
     setBgMusicFile(null);
     setBgMusicFileKey('');
     setBgMusicName('');
+
+    // Reset Original Audio
+    setKeepOriginalAudio(false);
+    setOriginalAudioMode('full');
   }, [aspectRatio]);
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -327,7 +335,9 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
           },
           language: subtitleLanguage,
           voice_code: subtitleVoiceCode,
-          resize_mode: aspectRatio
+          resize_mode: aspectRatio,
+          keep_original_audio: keepOriginalAudio,
+          original_audio_mode: keepOriginalAudio ? originalAudioMode : undefined
         };
 
         await axios.post(
@@ -360,7 +370,9 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
           },
           language: subtitleLanguage,
           voice_code: subtitleVoiceCode,
-          resize_mode: aspectRatio
+          resize_mode: aspectRatio,
+          keep_original_audio: keepOriginalAudio,
+          original_audio_mode: keepOriginalAudio ? originalAudioMode : undefined
         },);
       
 
@@ -396,7 +408,9 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
           },
           language: subtitleLanguage,
           voice_code: subtitleVoiceCode,
-          resize_mode: aspectRatio
+          resize_mode: aspectRatio,
+          keep_original_audio: keepOriginalAudio,
+          original_audio_mode: keepOriginalAudio ? originalAudioMode : undefined
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -674,6 +688,49 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ video, onSave }) => {
                           16:9 Landscape
                       </button>
                   </div>
+              </div>
+
+              {/* Original Audio Option */}
+              <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700/50">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-gray-300">Giữ âm thanh gốc</span>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                        <input 
+                            type="checkbox" 
+                            checked={keepOriginalAudio} 
+                            onChange={e => setKeepOriginalAudio(e.target.checked)} 
+                            className="sr-only peer" 
+                        />
+                        <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
+                  </div>
+                  
+                  {keepOriginalAudio && (
+                      <div className="mt-3 pl-2 border-l-2 border-blue-500/50 flex flex-col gap-2">
+                          <label className="flex items-center gap-2 cursor-pointer">
+                              <input 
+                                  type="radio" 
+                                  name="originalAudioMode" 
+                                  value="full" 
+                                  checked={originalAudioMode === 'full'} 
+                                  onChange={() => setOriginalAudioMode('full')}
+                                  className="text-blue-500 bg-gray-800 border-gray-700" 
+                              />
+                              <span className="text-sm text-gray-400">Giữ full tiếng gốc</span>
+                          </label>
+                          <label className="flex items-center gap-2 cursor-pointer">
+                              <input 
+                                  type="radio" 
+                                  name="originalAudioMode" 
+                                  value="bg_music_only" 
+                                  checked={originalAudioMode === 'bg_music_only'} 
+                                  onChange={() => setOriginalAudioMode('bg_music_only')}
+                                  className="text-blue-500 bg-gray-800 border-gray-700" 
+                              />
+                              <span className="text-sm text-gray-400">Giữ nhạc nền (bỏ giọng nói)</span>
+                          </label>
+                      </div>
+                  )}
               </div>
 
               <div className="grid grid-cols-2 gap-3">
